@@ -26,7 +26,10 @@ const MAX_BASKET_ITEMS = 100
 
 const emptyBasket: BasketState = { productCodes: [], summaryResponse: null, errorMessage: null }
 
-async function updateBasket(previous: BasketState, action: BasketAction): Promise<BasketState> {
+export async function updateBasket(
+  previous: BasketState,
+  action: BasketAction,
+): Promise<BasketState> {
   if (action.type === 'clear') {
     return emptyBasket
   }
