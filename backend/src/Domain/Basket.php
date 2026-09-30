@@ -4,17 +4,22 @@ declare(strict_types=1);
 
 namespace Acme\Domain;
 
+use Acme\Domain\Offer\Offer;
 use Acme\Repository\ProductRepository;
 
 final class Basket
 {
     private array $lines = [];
 
+    private readonly array $offers;
+
     public function __construct(
         private readonly ProductRepository $catalogue,
         private readonly DeliveryRules $deliveryRules,
-        private readonly array $offers = [],
-    ) {}
+        Offer ...$offers,
+    ) {
+        $this->offers = $offers;
+    }
 
     public function add(string $productCode): void
     {

@@ -1,0 +1,91 @@
+@use '../../styles/tokens' as *;
+
+.header {
+  background: $color-surface;
+  border-bottom: 1px solid $color-border;
+}
+
+.inner {
+  max-width: $page-width;
+  margin: 0 auto;
+  padding: 12px $space-lg;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-md;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  position: relative;
+  width: 40px;
+  height: 28px;
+  flex-shrink: 0;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 24px;
+    height: 28px;
+    border-radius: 12px;
+  }
+
+  &::before {
+    left: 0;
+    background: #7fb0ff;
+  }
+
+  &::after {
+    right: 0;
+    background: $color-accent;
+    mix-blend-mode: multiply;
+  }
+}
+
+.title {
+  font-size: 1.25rem;
+}
+
+.subtitle {
+  color: $color-muted;
+  font-size: 0.85rem;
+}
+
+.basketLink {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-sm;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  border-radius: $radius-pill;
+  background: $color-accent-soft;
+  color: $color-accent;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover {
+    background: color-mix(in srgb, $color-accent-soft, $color-accent 8%);
+  }
+}
+
+@include below($breakpoint-md) {
+  .title {
+    font-size: 1.1rem;
+  }
+
+  .subtitle {
+    font-size: 0.8rem;
+  }
+
+  .basketLink {
+    padding: 7px 12px;
+  }
+}

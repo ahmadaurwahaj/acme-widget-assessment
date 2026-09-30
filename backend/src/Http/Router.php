@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Acme\Http;
 
 use Acme\Http\Controller\BasketController;
+use Acme\Http\Controller\OfferController;
 use Acme\Http\Controller\ProductController;
 use Acme\Http\RateLimit\RateLimiter;
 use Psr\Log\LoggerInterface;
@@ -17,6 +18,7 @@ final readonly class Router
     public function __construct(
         private ProductController $productController,
         private BasketController $basketController,
+        private OfferController $offerController,
         private RateLimiter $rateLimiter,
         private LoggerInterface $logger,
     ) {}
@@ -71,6 +73,9 @@ final readonly class Router
         $routes = [
             '/products' => [
                 'GET' => fn(Request $request): JsonResponse => $this->productController->list(),
+            ],
+            '/offers' => [
+                'GET' => fn(Request $request): JsonResponse => $this->offerController->list(),
             ],
             '/basket/total' => [
                 'POST' => fn(Request $request): JsonResponse => $this->basketController->total($request->body),

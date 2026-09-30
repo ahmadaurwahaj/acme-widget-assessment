@@ -23,8 +23,8 @@ final class BuyOneGetSecondHalfPriceTest extends TestCase
     #[DataProvider('quantities')]
     public function testDiscountPerPair(int $quantity, int $expectedDiscount): void
     {
-        $offer = new BuyOneGetSecondHalfPrice('R01');
         $redWidget = new Product('R01', 'Red Widget', 3295);
+        $offer = new BuyOneGetSecondHalfPrice($redWidget);
 
         $discount = $offer->discount([new BasketLine($redWidget, $quantity)]);
 
@@ -33,11 +33,20 @@ final class BuyOneGetSecondHalfPriceTest extends TestCase
 
     public function testOtherProductsAreIgnored(): void
     {
-        $offer = new BuyOneGetSecondHalfPrice('R01');
+        $offer = new BuyOneGetSecondHalfPrice(new Product('R01', 'Red Widget', 3295));
         $greenWidget = new Product('G01', 'Green Widget', 2495);
 
         $discount = $offer->discount([new BasketLine($greenWidget, 2)]);
 
         self::assertSame(0, $discount);
+    }
+
+    public function testDescriptionUsesTheProductName(): void
+    {
+        $offer = new BuyOneGetSecondHalfPrice(new Product('R01', 'Red Widget', 3295));
+
+        $description = $offer->description();
+
+        self::assertSame('Buy one Red Widget, get the second one half price', $description);
     }
 }

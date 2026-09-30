@@ -1,0 +1,98 @@
+@use 'sass:map';
+@use '../../styles/tokens' as *;
+
+.banner {
+  grid-column: 1 / -1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-lg;
+  min-height: 116px;
+  padding: 20px 28px;
+  overflow: hidden;
+  background: linear-gradient(100deg, #eef4ff 0%, #f5f8ff 60%, #fdf1f3 100%);
+  border: 1px solid #dde7fb;
+  border-radius: $radius-lg;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: $radius-pill;
+  background: #dfe9ff;
+  color: $color-accent;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.offers {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.art {
+  position: relative;
+  width: 170px;
+  height: 90px;
+  flex-shrink: 0;
+}
+
+.cubeRed,
+.cubeGreen,
+.cubeBlue {
+  position: absolute;
+}
+
+.cubeRed {
+  @include cube(map.get($widget-colors, 'R01'), 68px);
+
+  right: 52px;
+  top: 4px;
+  transform: rotate(-8deg);
+}
+
+.cubeGreen {
+  @include cube(map.get($widget-colors, 'G01'), 36px);
+
+  right: 6px;
+  bottom: 0;
+  transform: rotate(10deg);
+}
+
+.cubeBlue {
+  @include cube(map.get($widget-colors, 'B01'), 30px);
+
+  right: 136px;
+  bottom: 4px;
+  transform: rotate(14deg);
+}
+
+@include below($breakpoint-md) {
+  .banner {
+    padding: 18px;
+  }
+
+  .offers {
+    font-size: 1.1rem;
+  }
+
+  .art {
+    display: none;
+  }
+}

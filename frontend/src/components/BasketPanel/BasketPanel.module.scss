@@ -6,6 +6,7 @@
   padding: 20px;
   position: sticky;
   top: $space-lg;
+  scroll-margin-top: $space-lg;
 
   @include below($breakpoint-md) {
     position: static;
@@ -15,7 +16,15 @@
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.2rem;
 }
 
 .clearButton {
@@ -23,16 +32,45 @@
   background: none;
   padding: 0;
   color: $color-accent;
+  font-weight: 600;
 }
 
 .muted {
-  margin: 0;
   color: $color-muted;
 }
 
 .error {
-  margin: 0 0 12px;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-radius: $radius-sm;
+  background: #fdecec;
   color: $color-danger;
+  font-weight: 600;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: $space-md 0;
+  text-align: center;
+}
+
+.emptyIcon {
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  margin-bottom: 12px;
+  border-radius: 50%;
+  background: $color-accent-soft;
+  color: #5b7fc9;
+}
+
+.emptyTitle {
+  font-size: 1.05rem;
+  font-weight: 800;
 }
 
 .summary {
@@ -53,19 +91,22 @@
     display: flex;
     justify-content: space-between;
     gap: 12px;
-    padding: $space-xs 0;
+    padding: 4px 0;
+    font-weight: 600;
   }
 }
 
 .quantity {
   color: $color-muted;
+  font-weight: 500;
 }
 
 .totals {
   display: grid;
   grid-template-columns: 1fr auto;
-  row-gap: $space-sm;
+  row-gap: 8px;
   margin: 0;
+  color: $color-muted;
 
   dt {
     margin: 0;
@@ -74,18 +115,21 @@
   dd {
     margin: 0;
     text-align: right;
+    color: $color-text;
+    font-weight: 600;
     font-variant-numeric: tabular-nums;
   }
 }
 
-.discount {
+.totals .discount {
   color: $color-success;
 }
 
-.grandTotal {
+.totals .grandTotal {
   margin-top: $space-sm;
-  padding-top: 12px;
+  padding-top: 14px;
   border-top: 1px solid $color-border;
-  font-weight: 700;
+  color: $color-text;
   font-size: 1.15rem;
+  font-weight: 800;
 }

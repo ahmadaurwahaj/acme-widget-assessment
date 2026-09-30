@@ -27,3 +27,7 @@ export type PriceBasketRequestDto = {
 export type ErrorResponseDto = {
   error: string
 }
+
+export type OfferResponseDto = {
+  description: string
+}

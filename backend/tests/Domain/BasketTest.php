@@ -16,7 +16,7 @@ final class BasketTest extends TestCase
     {
         $storeConfig = StoreConfig::fromFile(__DIR__ . '/../../config/store.php');
 
-        $basket = new Basket($storeConfig->productRepository, $storeConfig->deliveryRules, $storeConfig->offers);
+        $basket = new Basket($storeConfig->productRepository, $storeConfig->deliveryRules, ...$storeConfig->offers);
 
         return $basket;
     }

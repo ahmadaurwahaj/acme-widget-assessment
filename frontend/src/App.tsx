@@ -1,35 +1,47 @@
 import styles from './App.module.scss'
 import { BasketPanel } from './components/BasketPanel/BasketPanel'
+import { OfferBanner } from './components/OfferBanner/OfferBanner'
 import { ProductList } from './components/ProductList/ProductList'
+import { SiteHeader } from './components/SiteHeader/SiteHeader'
 import { useBasket } from './hooks/useBasket'
-import { useProducts } from './hooks/useProducts'
+import { useRemoteData } from './hooks/useRemoteData'
+import { getOffers } from './services/offerService'
+import { getProducts } from './services/productService'
 
 export default function App() {
-  const products = useProducts()
+  const products = useRemoteData(getProducts)
+  const offers = useRemoteData(getOffers)
   const { basket, isUpdating, addProduct, clearBasket } = useBasket()
+  const itemCount = basket.productCodes.length
 
   return (
-    <main className={styles.layout}>
-      <header className={styles.header}>
-        <h1>Acme Widget Co</h1>
-        <p className={styles.muted}>Sales basket proof of concept</p>
-      </header>
+    <>
+      <SiteHeader itemCount={itemCount} />
 
-      <section aria-labelledby="products-heading">
-        <h2 id="products-heading">Products</h2>
+      <main className={styles.layout}>
+        {offers.status === 'loaded' && <OfferBanner offers={offers.response} />}
 
-        {products.status === 'loading' && <p className={styles.muted}>Loading products…</p>}
-        {products.status === 'failed' && (
-          <p className={styles.error} role="alert">
-            {products.message}
-          </p>
-        )}
-        {products.status === 'loaded' && (
-          <ProductList products={products.response} onAddProduct={addProduct} />
-        )}
-      </section>
+        <section aria-labelledby="products-heading">
+          <div className={styles.sectionHeader}>
+            <h2 id="products-heading" className={styles.sectionTitle}>
+              Products
+            </h2>
+            <p className={styles.muted}>Pick a widget and add it to your basket.</p>
+          </div>
 
-      <BasketPanel basket={basket} isUpdating={isUpdating} onClearBasket={clearBasket} />
-    </main>
+          {products.status === 'loading' && <p className={styles.muted}>Loading products…</p>}
+          {products.status === 'failed' && (
+            <p className={styles.error} role="alert">
+              {products.message}
+            </p>
+          )}
+          {products.status === 'loaded' && (
+            <ProductList products={products.response} onAddProduct={addProduct} />
+          )}
+        </section>
+
+        <BasketPanel basket={basket} isUpdating={isUpdating} onClearBasket={clearBasket} />
+      </main>
+    </>
   )
 }

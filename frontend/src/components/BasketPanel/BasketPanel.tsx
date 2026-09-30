@@ -1,6 +1,7 @@
 import type { BasketState } from '../../hooks/useBasket'
 import type { BasketSummaryResponseDto } from '../../types/dto'
 import { formatCents } from '../../utils/money'
+import { BasketIcon, CartIcon } from '../icons/icons'
 import styles from './BasketPanel.module.scss'
 
 type BasketPanelProps = {
@@ -13,9 +14,12 @@ export function BasketPanel({ basket, isUpdating, onClearBasket }: BasketPanelPr
   const hasItems = basket.productCodes.length > 0
 
   return (
-    <section className={styles.panel} aria-labelledby="basket-heading">
+    <section id="basket" className={styles.panel} aria-labelledby="basket-heading">
       <header className={styles.header}>
-        <h2 id="basket-heading">Basket</h2>
+        <h2 id="basket-heading" className={styles.title}>
+          <CartIcon size={20} />
+          Basket
+        </h2>
 
         {hasItems && (
           <button type="button" className={styles.clearButton} onClick={onClearBasket}>
@@ -49,7 +53,15 @@ function BasketContent({ summaryResponse, isUpdating }: BasketContentProps) {
     return <p className={styles.muted}>Calculating…</p>
   }
 
-  return <p className={styles.muted}>Your basket is empty.</p>
+  return (
+    <div className={styles.empty}>
+      <div className={styles.emptyIcon}>
+        <BasketIcon />
+      </div>
+      <p className={styles.emptyTitle}>Your basket is empty.</p>
+      <p className={styles.muted}>Add some widgets to get started!</p>
+    </div>
+  )
 }
 
 type BasketSummaryProps = {

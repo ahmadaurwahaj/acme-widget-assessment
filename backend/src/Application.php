@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Acme;
 
 use Acme\Http\Controller\BasketController;
+use Acme\Http\Controller\OfferController;
 use Acme\Http\Controller\ProductController;
 use Acme\Http\RateLimit\RateLimiter;
 use Acme\Http\Router;
 use Acme\Service\BasketService;
+use Acme\Service\OfferService;
 use Acme\Service\ProductService;
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\StreamHandler;
@@ -25,12 +27,14 @@ final class Application
         $basketService = new BasketService(
             $storeConfig->productRepository,
             $storeConfig->deliveryRules,
-            $storeConfig->offers,
+            ...$storeConfig->offers,
         );
+        $offerService = new OfferService(...$storeConfig->offers);
 
         $router = new Router(
             new ProductController($productService),
             new BasketController($basketService),
+            new OfferController($offerService),
             $rateLimiter,
             $logger,
         );

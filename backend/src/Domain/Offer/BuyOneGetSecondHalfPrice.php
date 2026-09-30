@@ -4,16 +4,25 @@ declare(strict_types=1);
 
 namespace Acme\Domain\Offer;
 
+use Acme\Domain\Product;
+
 final readonly class BuyOneGetSecondHalfPrice implements Offer
 {
-    public function __construct(private string $productCode) {}
+    public function __construct(private Product $product) {}
+
+    public function description(): string
+    {
+        $description = "Buy one {$this->product->name}, get the second one half price";
+
+        return $description;
+    }
 
     public function discount(array $lines): int
     {
         $discount = 0;
 
         foreach ($lines as $line) {
-            if ($line->product->code !== $this->productCode) {
+            if ($line->product->code !== $this->product->code) {
                 continue;
             }
 

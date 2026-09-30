@@ -1,30 +1,33 @@
 @use './styles/tokens' as *;
 
 .layout {
-  max-width: 960px;
+  max-width: $page-width;
   margin: 0 auto;
-  padding: $space-xl $space-md;
+  padding: 24px $space-lg 32px;
   display: grid;
   grid-template-columns: 1fr 340px;
-  gap: 32px;
+  gap: 24px;
   align-items: start;
 
   @include below($breakpoint-md) {
     grid-template-columns: 1fr;
-    padding-top: $space-lg;
+    padding: 20px $space-md 32px;
+    gap: $space-lg;
   }
 }
 
-.header {
-  grid-column: 1 / -1;
+.sectionHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 14px;
+}
 
-  h1 {
-    font-size: 1.75rem;
-  }
+.sectionTitle {
+  font-size: 1.4rem;
 }
 
 .muted {
-  margin: 0;
   color: $color-muted;
 }
 

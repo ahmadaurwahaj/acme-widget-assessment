@@ -1,3 +1,4 @@
+@use 'sass:map';
 @use '../../styles/tokens' as *;
 
 .list {
@@ -12,21 +13,27 @@
   @include card;
 
   display: grid;
-  grid-template-columns: auto 1fr auto auto;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: $space-md;
-  padding: $space-md;
+  gap: 18px;
+  padding: 14px 16px;
 }
 
-.swatch {
-  width: 36px;
-  height: 36px;
-  border-radius: $radius-sm;
-  background: $color-muted;
+.tile {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  border-radius: $radius-md;
+  background: $color-bg;
 
   @each $code, $color in $widget-colors {
     &[data-product='#{$code}'] {
-      background: $color;
+      background: map.get($widget-tints, $code);
+
+      .cube {
+        @include cube($color, 44px);
+      }
     }
   }
 }
@@ -34,10 +41,12 @@
 .info {
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 
 .name {
-  font-weight: 600;
+  font-size: 1.05rem;
+  font-weight: 700;
 }
 
 .code {
@@ -45,19 +54,45 @@
   font-size: 0.85rem;
 }
 
+.buy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
 .price {
+  font-size: 1.15rem;
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
 
 .addButton {
-  padding: $space-sm 18px;
-  border: 0;
-  border-radius: $radius-sm;
-  background: $color-accent;
-  color: #fff;
-  font-weight: 600;
+  @include primary-button;
+}
 
-  &:hover {
-    background: $color-accent-hover;
+@include below($breakpoint-md) {
+  .card {
+    grid-template-columns: auto 1fr;
+    gap: $space-md;
+    padding: $space-md;
+  }
+
+  .tile {
+    width: 64px;
+    height: 64px;
+
+    @each $code, $color in $widget-colors {
+      &[data-product='#{$code}'] .cube {
+        @include cube($color, 36px);
+      }
+    }
+  }
+
+  .buy {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
   }
 }

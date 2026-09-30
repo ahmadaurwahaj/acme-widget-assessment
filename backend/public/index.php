@@ -10,7 +10,7 @@ use Acme\StoreConfig;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-const REQUESTS_PER_MINUTE = 10;
+const REQUESTS_PER_MINUTE = 25;
 
 $logger = Application::createLogger();
 

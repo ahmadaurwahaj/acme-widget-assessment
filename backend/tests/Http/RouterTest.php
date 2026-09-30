@@ -56,6 +56,17 @@ final class RouterTest extends TestCase
         );
     }
 
+    public function testListsOffers(): void
+    {
+        $response = $this->send('GET', '/api/v1/offers');
+
+        self::assertSame(200, $response->status);
+        self::assertSame(
+            [['description' => 'Buy one Red Widget, get the second one half price']],
+            $this->responseBodyOf($response),
+        );
+    }
+
     public function testPricesBasketFromProductCodes(): void
     {
         $response = $this->send('POST', '/api/v1/basket/total', '{"productCodes":["R01","R01"]}');
