@@ -22,11 +22,11 @@ export function CartIcon({ size = 18 }: IconProps) {
   )
 }
 
-export function TagIcon({ size = 16 }: IconProps) {
+export function TagIcon() {
   return (
     <svg
-      width={size}
-      height={size}
+      width="16"
+      height="16"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -41,11 +41,11 @@ export function TagIcon({ size = 16 }: IconProps) {
   )
 }
 
-export function BasketIcon({ size = 40 }: IconProps) {
+export function BasketIcon() {
   return (
     <svg
-      width={size}
-      height={size}
+      width="40"
+      height="40"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -61,11 +61,11 @@ export function BasketIcon({ size = 40 }: IconProps) {
   )
 }
 
-export function MinusIcon({ size = 14 }: IconProps) {
+export function MinusIcon() {
   return (
     <svg
-      width={size}
-      height={size}
+      width="14"
+      height="14"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -78,11 +78,11 @@ export function MinusIcon({ size = 14 }: IconProps) {
   )
 }
 
-export function PlusIcon({ size = 14 }: IconProps) {
+export function PlusIcon() {
   return (
     <svg
-      width={size}
-      height={size}
+      width="14"
+      height="14"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"

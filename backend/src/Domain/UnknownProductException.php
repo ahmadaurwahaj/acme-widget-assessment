@@ -8,7 +8,7 @@ use InvalidArgumentException;
 
 final class UnknownProductException extends InvalidArgumentException
 {
-    public function __construct(public readonly string $productCode)
+    public function __construct(string $productCode)
     {
         parent::__construct("Unknown product code: {$productCode}");
     }

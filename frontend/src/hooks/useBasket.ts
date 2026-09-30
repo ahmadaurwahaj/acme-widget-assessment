@@ -13,7 +13,7 @@ type ProductAction = { type: 'add' | 'remove'; productCode: string }
 
 type BasketAction = ProductAction | { type: 'clear' }
 
-export type UseBasketResult = {
+type UseBasketResult = {
   basket: BasketState
   isUpdating: boolean
   isFull: boolean

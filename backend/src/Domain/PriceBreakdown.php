@@ -14,7 +14,7 @@ final readonly class PriceBreakdown
         public int $deliveryInCents,
         public int $totalInCents,
     ) {
-        if ($subtotalInCents < 0 || $discountInCents < 0 || $deliveryInCents < 0 || $totalInCents < 0) {
+        if ($subtotalInCents < 0 || $discountInCents < 0 || $deliveryInCents < 0) {
             throw new InvalidArgumentException('Prices in a breakdown cannot be negative.');
         }
         if ($discountInCents > $subtotalInCents) {
