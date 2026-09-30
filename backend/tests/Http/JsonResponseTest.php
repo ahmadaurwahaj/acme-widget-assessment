@@ -18,6 +18,21 @@ final class JsonResponseTest extends TestCase
         self::assertSame('{"error":"Not found."}', $response->json);
     }
 
+    public function testAddsTheStandardHeadersAndKeepsItsOwn(): void
+    {
+        $response = JsonResponse::error(429, 'Too many requests.', ['Retry-After' => '30']);
+
+        self::assertSame(
+            [
+                'Content-Type' => 'application/json',
+                'X-Content-Type-Options' => 'nosniff',
+                'Cache-Control' => 'no-store',
+                'Retry-After' => '30',
+            ],
+            $response->headers,
+        );
+    }
+
     public function testBodyThatCannotBeEncodedFailsBeforeAnythingIsSent(): void
     {
         $this->expectException(JsonException::class);

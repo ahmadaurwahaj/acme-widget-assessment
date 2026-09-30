@@ -25,12 +25,6 @@ final readonly class Application
 {
     private const int DEFAULT_REQUESTS_PER_MINUTE = 25;
 
-    private const array STANDARD_HEADERS = [
-        'Content-Type' => 'application/json',
-        'X-Content-Type-Options' => 'nosniff',
-        'Cache-Control' => 'no-store',
-    ];
-
     public function __construct(
         private string $storeConfigPath,
         private string $rateLimitDirectory,
@@ -62,13 +56,12 @@ final readonly class Application
             $rateLimiter = new FileRateLimiter($this->rateLimitDirectory, $this->requestsPerMinute, windowSeconds: 60);
             $router = self::createRouter($storeConfig, $rateLimiter, $this->logger);
 
-            $response = $router->handle(self::requestFrom($server, $requestBody));
+            return $router->handle(self::requestFrom($server, $requestBody));
         } catch (Throwable $e) {
             $this->logger->error('Unhandled exception while handling request', ['exception' => $e]);
-            $response = JsonResponse::error(500, 'Internal server error.');
-        }
 
-        return new JsonResponse($response->status, $response->body, [...self::STANDARD_HEADERS, ...$response->headers]);
+            return JsonResponse::error(500, 'Internal server error.');
+        }
     }
 
     public static function emit(JsonResponse $response): void
