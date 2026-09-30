@@ -38,8 +38,6 @@ final readonly class DeliveryRules
             return self::FREE_DELIVERY;
         }
 
-        $deliveryCharge = $matchingTier->chargeInCents;
-
-        return $deliveryCharge;
+        return $matchingTier->chargeInCents;
     }
 }

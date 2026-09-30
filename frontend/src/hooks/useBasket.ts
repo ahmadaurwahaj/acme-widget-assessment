@@ -9,22 +9,33 @@ export type BasketState = {
   errorMessage: string | null
 }
 
-type BasketAction =
-  { type: 'add'; productCode: string } | { type: 'remove'; productCode: string } | { type: 'clear' }
+type ProductAction = { type: 'add' | 'remove'; productCode: string }
+
+type BasketAction = ProductAction | { type: 'clear' }
 
 export type UseBasketResult = {
   basket: BasketState
   isUpdating: boolean
+  isFull: boolean
   addProduct: (productCode: string) => void
   removeProduct: (productCode: string) => void
   clearBasket: () => void
 }
+
+const MAX_BASKET_ITEMS = 100
 
 const emptyBasket: BasketState = { productCodes: [], summaryResponse: null, errorMessage: null }
 
 async function updateBasket(previous: BasketState, action: BasketAction): Promise<BasketState> {
   if (action.type === 'clear') {
     return emptyBasket
+  }
+
+  if (action.type === 'add' && previous.productCodes.length >= MAX_BASKET_ITEMS) {
+    return {
+      ...previous,
+      errorMessage: `A basket cannot hold more than ${MAX_BASKET_ITEMS} items.`,
+    }
   }
 
   const productCodes = nextProductCodes(previous.productCodes, action)
@@ -35,31 +46,26 @@ async function updateBasket(previous: BasketState, action: BasketAction): Promis
 
   try {
     const summaryResponse = await getBasketTotal(productCodes)
-    const updatedBasket: BasketState = { productCodes, summaryResponse, errorMessage: null }
 
-    return updatedBasket
+    return { productCodes, summaryResponse, errorMessage: null }
   } catch (error) {
-    const unchangedBasket: BasketState = { ...previous, errorMessage: toErrorMessage(error) }
-
-    return unchangedBasket
+    return { ...previous, errorMessage: toErrorMessage(error) }
   }
 }
 
-function nextProductCodes(productCodes: string[], action: BasketAction): string[] {
+function nextProductCodes(productCodes: string[], action: ProductAction): string[] {
   if (action.type === 'add') {
-    const withAddedCode = [...productCodes, action.productCode]
-
-    return withAddedCode
+    return [...productCodes, action.productCode]
   }
 
-  const lastIndex = action.type === 'remove' ? productCodes.lastIndexOf(action.productCode) : -1
-  const withoutRemovedCode = productCodes.filter((_, index) => index !== lastIndex)
+  const lastIndex = productCodes.lastIndexOf(action.productCode)
 
-  return withoutRemovedCode
+  return productCodes.filter((_, index) => index !== lastIndex)
 }
 
 export function useBasket(): UseBasketResult {
   const [basket, dispatch, isUpdating] = useActionState(updateBasket, emptyBasket)
+  const isFull = basket.productCodes.length >= MAX_BASKET_ITEMS
 
   function addProduct(productCode: string): void {
     startTransition(() => {
@@ -79,5 +85,5 @@ export function useBasket(): UseBasketResult {
     })
   }
 
-  return { basket, isUpdating, addProduct, removeProduct, clearBasket }
+  return { basket, isUpdating, isFull, addProduct, removeProduct, clearBasket }
 }

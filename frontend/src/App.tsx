@@ -11,7 +11,7 @@ import { getProducts } from './services/productService'
 export default function App() {
   const products = useRemoteData(getProducts)
   const offers = useRemoteData(getOffers)
-  const { basket, isUpdating, addProduct, removeProduct, clearBasket } = useBasket()
+  const { basket, isUpdating, isFull, addProduct, removeProduct, clearBasket } = useBasket()
   const itemCount = basket.productCodes.length
 
   return (
@@ -36,13 +36,18 @@ export default function App() {
             </p>
           )}
           {products.status === 'loaded' && (
-            <ProductList products={products.response} onAddProduct={addProduct} />
+            <ProductList
+              products={products.response}
+              isBasketFull={isFull}
+              onAddProduct={addProduct}
+            />
           )}
         </section>
 
         <BasketPanel
           basket={basket}
           isUpdating={isUpdating}
+          isFull={isFull}
           onAddProduct={addProduct}
           onRemoveProduct={removeProduct}
           onClearBasket={clearBasket}

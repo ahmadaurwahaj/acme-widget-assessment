@@ -4,24 +4,27 @@ declare(strict_types=1);
 
 namespace Acme\Http\Controller;
 
+use Acme\Domain\Offer\Offer;
 use Acme\Http\Dto\OfferResponseDto;
 use Acme\Http\JsonResponse;
-use Acme\Service\OfferService;
 
 final readonly class OfferController
 {
-    public function __construct(private OfferService $offerService) {}
+    /** @var list<Offer> */
+    private array $offers;
+
+    public function __construct(Offer ...$offers)
+    {
+        $this->offers = array_values($offers);
+    }
 
     public function list(): JsonResponse
     {
-        $offers = $this->offerService->listOffers();
         $offerDtos = [];
-        foreach ($offers as $offer) {
+        foreach ($this->offers as $offer) {
             $offerDtos[] = OfferResponseDto::fromOffer($offer);
         }
 
-        $response = new JsonResponse(200, $offerDtos);
-
-        return $response;
+        return new JsonResponse(200, $offerDtos);
     }
 }

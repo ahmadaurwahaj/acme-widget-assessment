@@ -37,11 +37,6 @@ final class Basket
         return array_values($this->lines);
     }
 
-    public function isEmpty(): bool
-    {
-        return $this->lines === [];
-    }
-
     public function priceBreakdown(): PriceBreakdown
     {
         $subtotal = $this->subtotal();
@@ -53,19 +48,22 @@ final class Basket
             $delivery = $this->deliveryRules->chargeFor($spendAfterOffers);
         }
 
-        $priceBreakdown = new PriceBreakdown(
+        return new PriceBreakdown(
             subtotalInCents: $subtotal,
             discountInCents: $discount,
             deliveryInCents: $delivery,
             totalInCents: $spendAfterOffers + $delivery,
         );
-
-        return $priceBreakdown;
     }
 
     public function total(): int
     {
         return $this->priceBreakdown()->totalInCents;
+    }
+
+    private function isEmpty(): bool
+    {
+        return $this->lines === [];
     }
 
     private function subtotal(): int

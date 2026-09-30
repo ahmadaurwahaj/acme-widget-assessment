@@ -15,8 +15,6 @@ final readonly class OfferResponseDto
 
     public static function fromOffer(Offer $offer): self
     {
-        $offerDto = new self($offer->code(), $offer->description());
-
-        return $offerDto;
+        return new self($offer->code(), $offer->description());
     }
 }

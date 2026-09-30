@@ -97,6 +97,17 @@
   }
 }
 
+.lineName {
+  display: flex;
+  flex-direction: column;
+}
+
+.unitPrice {
+  color: $color-muted;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
 .lineTotal {
   min-width: 64px;
   text-align: right;
@@ -119,9 +130,14 @@
     background: none;
     color: $color-text;
 
-    &:hover {
+    &:hover:not(:disabled) {
       border-color: $color-accent;
       color: $color-accent;
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
     }
   }
 }

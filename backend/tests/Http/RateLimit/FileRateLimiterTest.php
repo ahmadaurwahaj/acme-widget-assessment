@@ -5,22 +5,18 @@ declare(strict_types=1);
 namespace Acme\Tests\Http\RateLimit;
 
 use Acme\Http\RateLimit\FileRateLimiter;
+use Acme\Tests\UsesTemporaryDirectory;
 use PHPUnit\Framework\TestCase;
 
 final class FileRateLimiterTest extends TestCase
 {
-    private string $storageDirectory;
+    use UsesTemporaryDirectory;
 
     private int $now = 1_000_000;
 
-    protected function setUp(): void
-    {
-        $this->storageDirectory = sys_get_temp_dir() . '/acme-rate-limiter-test-' . bin2hex(random_bytes(4));
-    }
-
     private function limiterAllowing(int $maxRequests): FileRateLimiter
     {
-        return new FileRateLimiter($this->storageDirectory, $maxRequests, windowSeconds: 60, clock: fn(): int => $this->now);
+        return new FileRateLimiter($this->temporaryDirectory(), $maxRequests, windowSeconds: 60, clock: fn(): int => $this->now);
     }
 
     public function testAllowsRequestsUpToTheLimitThenAsksClientToWait(): void

@@ -8,6 +8,8 @@ use Acme\Http\Dto\ErrorResponseDto;
 
 final readonly class JsonResponse
 {
+    public string $json;
+
     /**
      * @param object|list<object> $body
      * @param array<string, string> $headers
@@ -16,15 +18,15 @@ final readonly class JsonResponse
         public int $status,
         public object|array $body,
         public array $headers = [],
-    ) {}
+    ) {
+        $this->json = json_encode($body, JSON_THROW_ON_ERROR);
+    }
 
     /** @param array<string, string> $headers */
     public static function error(int $status, string $message, array $headers = []): self
     {
         $errorDto = new ErrorResponseDto($message);
 
-        $response = new self($status, $errorDto, $headers);
-
-        return $response;
+        return new self($status, $errorDto, $headers);
     }
 }

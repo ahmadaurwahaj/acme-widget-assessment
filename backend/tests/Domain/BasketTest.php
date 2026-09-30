@@ -23,9 +23,15 @@ final class BasketTest extends TestCase
     {
         $storeConfig = StoreConfig::fromFile(__DIR__ . '/../../config/store.php');
 
-        $basket = new Basket($storeConfig->productRepository, $storeConfig->deliveryRules, ...$storeConfig->offers);
+        return new Basket($storeConfig->productRepository, $storeConfig->deliveryRules, ...$storeConfig->offers);
+    }
 
-        return $basket;
+    private function acmeDeliveryRules(): DeliveryRules
+    {
+        return new DeliveryRules(
+            new DeliveryTier(spendBelowInCents: 5000, chargeInCents: 495),
+            new DeliveryTier(spendBelowInCents: 9000, chargeInCents: 295),
+        );
     }
 
     /** @param list<string> $productCodes */
@@ -185,16 +191,6 @@ final class BasketTest extends TestCase
 
         self::assertSame(795, $priceBreakdown->discountInCents);
         self::assertSame(495, $priceBreakdown->totalInCents);
-    }
-
-    private function acmeDeliveryRules(): DeliveryRules
-    {
-        $deliveryRules = new DeliveryRules(
-            new DeliveryTier(spendBelowInCents: 5000, chargeInCents: 495),
-            new DeliveryTier(spendBelowInCents: 9000, chargeInCents: 295),
-        );
-
-        return $deliveryRules;
     }
 
     public function testUnknownProductIsRejected(): void

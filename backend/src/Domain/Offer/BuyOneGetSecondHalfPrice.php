@@ -13,16 +13,12 @@ final readonly class BuyOneGetSecondHalfPrice implements Offer
 
     public function code(): string
     {
-        $offerCode = strtolower($this->product->code) . '-second-half-price';
-
-        return $offerCode;
+        return strtolower($this->product->code) . '-second-half-price';
     }
 
     public function description(): string
     {
-        $description = "Buy one {$this->product->name}, get the second one half price";
-
-        return $description;
+        return "Buy one {$this->product->name}, get the second one half price";
     }
 
     public function discount(BasketLine ...$lines): int

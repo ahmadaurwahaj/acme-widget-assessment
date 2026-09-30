@@ -7,6 +7,7 @@ namespace Acme;
 use Acme\Domain\DeliveryRules;
 use Acme\Domain\Offer\Offer;
 use Acme\Repository\ProductRepository;
+use InvalidArgumentException;
 use LogicException;
 
 final readonly class StoreConfig
@@ -19,6 +20,14 @@ final readonly class StoreConfig
         public DeliveryRules $deliveryRules,
         Offer ...$offers,
     ) {
+        $offerCodes = [];
+        foreach ($offers as $offer) {
+            if (isset($offerCodes[$offer->code()])) {
+                throw new InvalidArgumentException("Duplicate offer code: {$offer->code()}");
+            }
+            $offerCodes[$offer->code()] = true;
+        }
+
         $this->offers = array_values($offers);
     }
 

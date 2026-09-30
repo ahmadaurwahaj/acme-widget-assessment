@@ -5,9 +5,19 @@ const API_BASE_URL = '/api/v1'
 export class ApiError extends Error {}
 
 export function isAbortError(error: unknown): boolean {
-  const isAbort = error instanceof DOMException && error.name === 'AbortError'
+  return error instanceof DOMException && error.name === 'AbortError'
+}
 
-  return isAbort
+export function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function isErrorResponse(value: unknown): value is ErrorResponseDto {
+  return isRecord(value) && typeof value.error === 'string'
+}
+
+export function unexpectedResponse(): ApiError {
+  return new ApiError('The server sent an unexpected response.')
 }
 
 export function toErrorMessage(error: unknown): string {
@@ -21,12 +31,14 @@ export function toErrorMessage(error: unknown): string {
 async function readErrorMessage(response: Response): Promise<string> {
   const retryAfterSeconds = Number(response.headers.get('Retry-After'))
   if (response.status === 429 && retryAfterSeconds > 0) {
-    return `Too many requests. Please try again in ${retryAfterSeconds} seconds.`
+    const unit = retryAfterSeconds === 1 ? 'second' : 'seconds'
+
+    return `Too many requests. Please try again in ${retryAfterSeconds} ${unit}.`
   }
 
-  const errorResponse: Partial<ErrorResponseDto> = await response.json().catch(() => ({}))
+  const errorResponse: unknown = await response.json().catch(() => null)
 
-  if (errorResponse.error) {
+  if (isErrorResponse(errorResponse)) {
     return errorResponse.error
   }
 
@@ -37,7 +49,7 @@ async function readErrorMessage(response: Response): Promise<string> {
   return `Request failed with status ${response.status}.`
 }
 
-async function request<T>(path: string, options: RequestInit): Promise<T> {
+async function request(path: string, options: RequestInit): Promise<unknown> {
   const url = `${API_BASE_URL}${path}`
   let response: Response
 
@@ -56,24 +68,21 @@ async function request<T>(path: string, options: RequestInit): Promise<T> {
     throw new ApiError(message)
   }
 
-  const responseBody: T = await response.json()
-
-  return responseBody
+  return response.json().catch(() => {
+    throw unexpectedResponse()
+  })
 }
 
-export async function get<T>(path: string, signal?: AbortSignal): Promise<T> {
-  const responseBody = await request<T>(path, { method: 'GET', signal })
-
-  return responseBody
+export function get(path: string, signal?: AbortSignal): Promise<unknown> {
+  return request(path, { method: 'GET', signal })
 }
 
-export async function post<T>(path: string, requestBody: unknown): Promise<T> {
+export function post(path: string, requestBody: unknown): Promise<unknown> {
   const options: RequestInit = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(requestBody),
   }
-  const responseBody = await request<T>(path, options)
 
-  return responseBody
+  return request(path, options)
 }

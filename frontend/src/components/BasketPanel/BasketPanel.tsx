@@ -7,6 +7,7 @@ import styles from './BasketPanel.module.scss'
 type BasketPanelProps = {
   basket: BasketState
   isUpdating: boolean
+  isFull: boolean
   onAddProduct: (productCode: string) => void
   onRemoveProduct: (productCode: string) => void
   onClearBasket: () => void
@@ -15,6 +16,7 @@ type BasketPanelProps = {
 export function BasketPanel({
   basket,
   isUpdating,
+  isFull,
   onAddProduct,
   onRemoveProduct,
   onClearBasket,
@@ -45,6 +47,7 @@ export function BasketPanel({
       <BasketContent
         summaryResponse={basket.summaryResponse}
         isUpdating={isUpdating}
+        isFull={isFull}
         onAddProduct={onAddProduct}
         onRemoveProduct={onRemoveProduct}
       />
@@ -55,6 +58,7 @@ export function BasketPanel({
 type BasketContentProps = {
   summaryResponse: BasketSummaryResponseDto | null
   isUpdating: boolean
+  isFull: boolean
   onAddProduct: (productCode: string) => void
   onRemoveProduct: (productCode: string) => void
 }
@@ -62,6 +66,7 @@ type BasketContentProps = {
 function BasketContent({
   summaryResponse,
   isUpdating,
+  isFull,
   onAddProduct,
   onRemoveProduct,
 }: BasketContentProps) {
@@ -70,6 +75,7 @@ function BasketContent({
       <BasketSummary
         summaryResponse={summaryResponse}
         isUpdating={isUpdating}
+        isFull={isFull}
         onAddProduct={onAddProduct}
         onRemoveProduct={onRemoveProduct}
       />
@@ -94,6 +100,7 @@ function BasketContent({
 type BasketSummaryProps = {
   summaryResponse: BasketSummaryResponseDto
   isUpdating: boolean
+  isFull: boolean
   onAddProduct: (productCode: string) => void
   onRemoveProduct: (productCode: string) => void
 }
@@ -101,6 +108,7 @@ type BasketSummaryProps = {
 function BasketSummary({
   summaryResponse,
   isUpdating,
+  isFull,
   onAddProduct,
   onRemoveProduct,
 }: BasketSummaryProps) {
@@ -113,7 +121,10 @@ function BasketSummary({
       <ul className={styles.lines}>
         {summaryResponse.lines.map((line) => (
           <li key={line.code}>
-            <span className={styles.lineName}>{line.name}</span>
+            <span className={styles.lineName}>
+              {line.name}
+              <span className={styles.unitPrice}>{formatCents(line.unitPriceInCents)} each</span>
+            </span>
             <span className={styles.stepper}>
               <button
                 type="button"
@@ -126,6 +137,7 @@ function BasketSummary({
               <button
                 type="button"
                 onClick={() => onAddProduct(line.code)}
+                disabled={isFull}
                 aria-label={`Add one ${line.name}`}
               >
                 <PlusIcon />
@@ -151,7 +163,9 @@ function BasketSummary({
         <dd>{deliveryLabel}</dd>
 
         <dt className={styles.grandTotal}>Total</dt>
-        <dd className={styles.grandTotal}>{formatCents(summaryResponse.totalInCents)}</dd>
+        <dd className={styles.grandTotal} aria-live="polite" aria-atomic="true">
+          {formatCents(summaryResponse.totalInCents)}
+        </dd>
       </dl>
     </div>
   )

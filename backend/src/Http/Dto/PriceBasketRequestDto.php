@@ -9,7 +9,7 @@ use JsonException;
 
 final readonly class PriceBasketRequestDto
 {
-    public const int MAX_ITEMS = 100;
+    private const int MAX_ITEMS = 100;
 
     private const string PRODUCT_CODE_PATTERN = '/^[A-Za-z0-9]{1,32}$/';
 
@@ -43,8 +43,6 @@ final readonly class PriceBasketRequestDto
             $productCodes[] = $rawCode;
         }
 
-        $requestDto = new self($productCodes);
-
-        return $requestDto;
+        return new self($productCodes);
     }
 }

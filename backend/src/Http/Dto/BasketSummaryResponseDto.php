@@ -26,14 +26,12 @@ final readonly class BasketSummaryResponseDto
 
         $priceBreakdown = $basket->priceBreakdown();
 
-        $summaryDto = new self(
+        return new self(
             lines: $lineDtos,
             subtotalInCents: $priceBreakdown->subtotalInCents,
             discountInCents: $priceBreakdown->discountInCents,
             deliveryInCents: $priceBreakdown->deliveryInCents,
             totalInCents: $priceBreakdown->totalInCents,
         );
-
-        return $summaryDto;
     }
 }

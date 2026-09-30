@@ -6,22 +6,19 @@ namespace Acme\Http\Controller;
 
 use Acme\Http\Dto\ProductResponseDto;
 use Acme\Http\JsonResponse;
-use Acme\Service\ProductService;
+use Acme\Repository\ProductRepository;
 
 final readonly class ProductController
 {
-    public function __construct(private ProductService $productService) {}
+    public function __construct(private ProductRepository $productRepository) {}
 
     public function list(): JsonResponse
     {
-        $products = $this->productService->listProducts();
         $productDtos = [];
-        foreach ($products as $product) {
+        foreach ($this->productRepository->findAll() as $product) {
             $productDtos[] = ProductResponseDto::fromProduct($product);
         }
 
-        $response = new JsonResponse(200, $productDtos);
-
-        return $response;
+        return new JsonResponse(200, $productDtos);
     }
 }

@@ -5,10 +5,11 @@ import styles from './ProductList.module.scss'
 
 type ProductListProps = {
   products: ProductResponseDto[]
+  isBasketFull: boolean
   onAddProduct: (productCode: string) => void
 }
 
-export function ProductList({ products, onAddProduct }: ProductListProps) {
+export function ProductList({ products, isBasketFull, onAddProduct }: ProductListProps) {
   return (
     <ul className={styles.list}>
       {products.map((product) => (
@@ -29,6 +30,7 @@ export function ProductList({ products, onAddProduct }: ProductListProps) {
               type="button"
               className={styles.addButton}
               onClick={() => onAddProduct(product.code)}
+              disabled={isBasketFull}
               aria-label={`Add ${product.name} to basket`}
             >
               <CartIcon size={16} />

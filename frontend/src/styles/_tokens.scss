@@ -99,7 +99,12 @@ $shadow-card:
   font-weight: 700;
   transition: background 0.15s;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background: $color-accent-hover;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 }

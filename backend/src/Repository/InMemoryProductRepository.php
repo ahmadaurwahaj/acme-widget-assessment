@@ -41,17 +41,13 @@ final class InMemoryProductRepository implements ProductRepository
             $products[] = $product;
         }
 
-        $repository = new self(...$products);
-
-        return $repository;
+        return new self(...$products);
     }
 
     /** @return list<Product> */
     public function findAll(): array
     {
-        $products = array_values($this->productsByCode);
-
-        return $products;
+        return array_values($this->productsByCode);
     }
 
     public function getByCode(string $code): Product
@@ -60,8 +56,6 @@ final class InMemoryProductRepository implements ProductRepository
             throw new UnknownProductException($code);
         }
 
-        $product = $this->productsByCode[$code];
-
-        return $product;
+        return $this->productsByCode[$code];
     }
 }

@@ -22,6 +22,8 @@ jobs:
           php-version: ${{ matrix.php }}
           tools: composer
 
+      - run: composer validate --strict
+
       - run: composer install --no-interaction --no-progress
 
       - run: composer check

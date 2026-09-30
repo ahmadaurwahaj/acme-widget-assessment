@@ -1,6 +1,7 @@
 services:
   composer:
     image: composer:2
+    user: "${UID:-1000}"
     working_dir: /app
     volumes:
       - ./backend:/app

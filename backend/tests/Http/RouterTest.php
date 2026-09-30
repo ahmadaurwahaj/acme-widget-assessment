@@ -10,37 +10,44 @@ use Acme\Http\RateLimit\FileRateLimiter;
 use Acme\Http\Request;
 use Acme\Http\Router;
 use Acme\StoreConfig;
+use Acme\Tests\UsesTemporaryDirectory;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 final class RouterTest extends TestCase
 {
+    use UsesTemporaryDirectory;
+
     private Router $router;
 
     protected function setUp(): void
     {
+        $this->router = $this->routerAllowing(1000);
+    }
+
+    private function routerAllowing(int $requestsPerMinute, LoggerInterface $logger = new NullLogger()): Router
+    {
         $storeConfig = StoreConfig::fromFile(__DIR__ . '/../../config/store.php');
-        $rateLimiter = new FileRateLimiter(sys_get_temp_dir() . '/acme-rate-limit-test-' . bin2hex(random_bytes(4)), 1000, 60);
-        $this->router = Application::createRouter($storeConfig, $rateLimiter, new NullLogger());
+        $rateLimiter = new FileRateLimiter($this->temporaryDirectory(), $requestsPerMinute, 60);
+
+        return Application::createRouter($storeConfig, $rateLimiter, $logger);
     }
 
     private function send(string $method, string $path, string $requestBody = ''): JsonResponse
     {
         $request = new Request($method, $path, $requestBody, clientIp: '203.0.113.7', contentType: 'application/json');
 
-        $response = $this->router->handle($request);
-
-        return $response;
+        return $this->router->handle($request);
     }
 
     /** @return array<mixed> */
     private function responseBodyOf(JsonResponse $response): array
     {
-        $responseJson = json_encode($response->body, JSON_THROW_ON_ERROR);
-        $responseBody = json_decode($responseJson, true, flags: JSON_THROW_ON_ERROR);
+        $responseBody = json_decode($response->json, true, flags: JSON_THROW_ON_ERROR);
         self::assertIsArray($responseBody);
 
         return $responseBody;
@@ -121,6 +128,8 @@ final class RouterTest extends TestCase
         yield 'wrong method' => ['GET', '/api/v1/basket/total', 405];
         yield 'unknown route' => ['GET', '/api/v1/orders', 404];
         yield 'unversioned path' => ['GET', '/api/products', 404];
+        yield 'POST to a read only route' => ['POST', '/api/v1/products', 405];
+        yield 'POST to an unknown route' => ['POST', '/api/v1/unknown', 404];
     }
 
     #[DataProvider('unroutableRequests')]
@@ -141,10 +150,8 @@ final class RouterTest extends TestCase
 
     public function testRateLimitedClientGets429WithRetryAfter(): void
     {
-        $storeConfig = StoreConfig::fromFile(__DIR__ . '/../../config/store.php');
-        $rateLimiter = new FileRateLimiter(sys_get_temp_dir() . '/acme-rate-limit-test-' . bin2hex(random_bytes(4)), 1, 60);
         $logRecords = new TestHandler();
-        $router = Application::createRouter($storeConfig, $rateLimiter, new Logger('test', [$logRecords]));
+        $router = $this->routerAllowing(1, new Logger('test', [$logRecords]));
         $request = new Request('POST', '/api/v1/basket/total', '{"productCodes":["R01"]}', clientIp: '203.0.113.9', contentType: 'application/json');
 
         $router->handle($request);
@@ -158,9 +165,7 @@ final class RouterTest extends TestCase
 
     public function testReadRequestsAreNotRateLimited(): void
     {
-        $storeConfig = StoreConfig::fromFile(__DIR__ . '/../../config/store.php');
-        $rateLimiter = new FileRateLimiter(sys_get_temp_dir() . '/acme-rate-limit-test-' . bin2hex(random_bytes(4)), 1, 60);
-        $router = Application::createRouter($storeConfig, $rateLimiter, new NullLogger());
+        $router = $this->routerAllowing(1);
         $request = new Request('GET', '/api/v1/products', '', clientIp: '203.0.113.10');
 
         $router->handle($request);
@@ -192,6 +197,35 @@ final class RouterTest extends TestCase
         $request = new Request('POST', '/api/v1/basket/total', '{"productCodes":["R01"]}', clientIp: '203.0.113.7', contentType: 'application/json; charset=utf-8');
 
         $response = $this->router->handle($request);
+
+        self::assertSame(200, $response->status);
+    }
+
+    /** @return iterable<string, array{string, int}> */
+    public static function unroutablePostsWithWrongContentType(): iterable
+    {
+        yield 'read only route' => ['/api/v1/products', 405];
+        yield 'unknown route' => ['/api/v1/unknown', 404];
+    }
+
+    #[DataProvider('unroutablePostsWithWrongContentType')]
+    public function testRouteIsCheckedBeforeContentType(string $path, int $expectedStatus): void
+    {
+        $request = new Request('POST', $path, 'hello', clientIp: '203.0.113.7', contentType: 'text/plain');
+
+        $response = $this->router->handle($request);
+
+        self::assertSame($expectedStatus, $response->status);
+    }
+
+    public function testUnknownRouteDoesNotUseUpTheRateLimit(): void
+    {
+        $router = $this->routerAllowing(1);
+        $unknownRouteRequest = new Request('POST', '/api/v1/unknown', '{}', clientIp: '203.0.113.11', contentType: 'application/json');
+        $basketRequest = new Request('POST', '/api/v1/basket/total', '{"productCodes":["R01"]}', clientIp: '203.0.113.11', contentType: 'application/json');
+
+        $router->handle($unknownRouteRequest);
+        $response = $router->handle($basketRequest);
 
         self::assertSame(200, $response->status);
     }

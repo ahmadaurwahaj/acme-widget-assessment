@@ -15,10 +15,8 @@ $deliveryRules = new DeliveryRules(
     new DeliveryTier(spendBelowInCents: 9000, chargeInCents: 295),
 );
 
-$storeConfig = new StoreConfig(
+return new StoreConfig(
     $productRepository,
     $deliveryRules,
     new BuyOneGetSecondHalfPrice($productRepository->getByCode('R01')),
 );
-
-return $storeConfig;

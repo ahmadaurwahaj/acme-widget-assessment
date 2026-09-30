@@ -13,8 +13,6 @@ final readonly class BasketLine
 
     public function totalInCents(): int
     {
-        $lineTotal = $this->product->priceInCents * $this->quantity;
-
-        return $lineTotal;
+        return $this->product->priceInCents * $this->quantity;
     }
 }

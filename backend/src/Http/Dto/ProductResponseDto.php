@@ -16,12 +16,10 @@ final readonly class ProductResponseDto
 
     public static function fromProduct(Product $product): self
     {
-        $productDto = new self(
+        return new self(
             code: $product->code,
             name: $product->name,
             priceInCents: $product->priceInCents,
         );
-
-        return $productDto;
     }
 }

@@ -27,8 +27,6 @@ final readonly class BasketController
 
         $summaryDto = BasketSummaryResponseDto::fromBasket($basket);
 
-        $response = new JsonResponse(200, $summaryDto);
-
-        return $response;
+        return new JsonResponse(200, $summaryDto);
     }
 }

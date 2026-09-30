@@ -14,7 +14,7 @@ use Psr\Log\LogLevel;
 
 final readonly class Router
 {
-    public const string PREFIX = '/api/v1';
+    private const string PREFIX = '/api/v1';
 
     public function __construct(
         private ProductController $productController,
@@ -27,32 +27,37 @@ final readonly class Router
     public function handle(Request $request): JsonResponse
     {
         try {
+            $handler = $this->handlerFor($request);
+
             if ($request->method === 'POST') {
                 $this->guardPostRequest($request);
             }
 
-            $route = $this->routeOf($request->path);
-            $routes = $this->routes();
-
-            if (!isset($routes[$route])) {
-                throw HttpException::notFound();
-            }
-
-            $handlersByMethod = $routes[$route];
-
-            if (!isset($handlersByMethod[$request->method])) {
-                $allowedMethods = array_keys($handlersByMethod);
-                throw HttpException::methodNotAllowed($allowedMethods);
-            }
-
-            $handler = $handlersByMethod[$request->method];
-            $response = $handler($request);
+            return $handler($request);
         } catch (HttpException $e) {
             $this->logRejectedRequest($request, $e);
-            $response = JsonResponse::error($e->status, $e->getMessage(), $e->headers);
+
+            return JsonResponse::error($e->status, $e->getMessage(), $e->headers);
+        }
+    }
+
+    /** @return Closure(Request): JsonResponse */
+    private function handlerFor(Request $request): Closure
+    {
+        $route = $this->routeOf($request->path);
+        $routes = $this->routes();
+
+        if (!isset($routes[$route])) {
+            throw HttpException::notFound();
         }
 
-        return $response;
+        $handlersByMethod = $routes[$route];
+
+        if (!isset($handlersByMethod[$request->method])) {
+            throw HttpException::methodNotAllowed(array_keys($handlersByMethod));
+        }
+
+        return $handlersByMethod[$request->method];
     }
 
     private function guardPostRequest(Request $request): void
@@ -84,7 +89,7 @@ final readonly class Router
     /** @return array<string, array<string, Closure(Request): JsonResponse>> */
     private function routes(): array
     {
-        $routes = [
+        return [
             '/products' => [
                 'GET' => fn(Request $request): JsonResponse => $this->productController->list(),
             ],
@@ -95,8 +100,6 @@ final readonly class Router
                 'POST' => fn(Request $request): JsonResponse => $this->basketController->total($request->body),
             ],
         ];
-
-        return $routes;
     }
 
     private function routeOf(string $path): string
@@ -105,8 +108,6 @@ final readonly class Router
             throw HttpException::notFound();
         }
 
-        $route = substr($path, strlen(self::PREFIX));
-
-        return $route;
+        return substr($path, strlen(self::PREFIX));
     }
 }

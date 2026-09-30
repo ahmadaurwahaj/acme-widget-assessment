@@ -18,14 +18,12 @@ final readonly class BasketLineResponseDto
 
     public static function fromBasketLine(BasketLine $line): self
     {
-        $lineDto = new self(
+        return new self(
             code: $line->product->code,
             name: $line->product->name,
             quantity: $line->quantity,
             unitPriceInCents: $line->product->priceInCents,
             lineTotalInCents: $line->totalInCents(),
         );
-
-        return $lineDto;
     }
 }
