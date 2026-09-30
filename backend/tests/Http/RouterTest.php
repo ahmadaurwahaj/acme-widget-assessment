@@ -36,6 +36,7 @@ final class RouterTest extends TestCase
         return $response;
     }
 
+    /** @return array<mixed> */
     private function responseBodyOf(JsonResponse $response): array
     {
         $responseJson = json_encode($response->body, JSON_THROW_ON_ERROR);
@@ -89,6 +90,7 @@ final class RouterTest extends TestCase
         self::assertSame(3790, $this->responseBodyOf($response)['totalInCents']);
     }
 
+    /** @return iterable<string, array{string, int}> */
     public static function invalidBasketRequests(): iterable
     {
         yield 'malformed JSON' => ['{"productCodes":', 400];
@@ -113,6 +115,7 @@ final class RouterTest extends TestCase
         self::assertArrayHasKey('error', $this->responseBodyOf($response));
     }
 
+    /** @return iterable<string, array{string, string, int}> */
     public static function unroutableRequests(): iterable
     {
         yield 'wrong method' => ['GET', '/api/v1/basket/total', 405];
@@ -166,6 +169,7 @@ final class RouterTest extends TestCase
         self::assertSame(200, $response->status);
     }
 
+    /** @return iterable<string, array{string}> */
     public static function wrongContentTypes(): iterable
     {
         yield 'missing' => [''];

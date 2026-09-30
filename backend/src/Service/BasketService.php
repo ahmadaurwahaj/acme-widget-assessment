@@ -11,6 +11,7 @@ use Acme\Repository\ProductRepository;
 
 final readonly class BasketService
 {
+    /** @var list<Offer> */
     private array $offers;
 
     public function __construct(
@@ -18,9 +19,10 @@ final readonly class BasketService
         private DeliveryRules $deliveryRules,
         Offer ...$offers,
     ) {
-        $this->offers = $offers;
+        $this->offers = array_values($offers);
     }
 
+    /** @param list<string> $productCodes */
     public function createBasket(array $productCodes): Basket
     {
         $basket = new Basket($this->productRepository, $this->deliveryRules, ...$this->offers);

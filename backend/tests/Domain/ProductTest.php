@@ -11,6 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 final class ProductTest extends TestCase
 {
+    /** @return iterable<string, array{string, string, int}> */
     public static function invalidProducts(): iterable
     {
         yield 'empty code' => ['', 'Red Widget', 3295];

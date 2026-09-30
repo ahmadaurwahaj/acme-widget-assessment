@@ -8,6 +8,7 @@ use Acme\Domain\Basket;
 
 final readonly class BasketSummaryResponseDto
 {
+    /** @param list<BasketLineResponseDto> $lines */
     public function __construct(
         public array $lines,
         public int $subtotalInCents,

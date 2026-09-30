@@ -9,12 +9,14 @@ export type BasketState = {
   errorMessage: string | null
 }
 
-type BasketAction = { type: 'add'; productCode: string } | { type: 'clear' }
+type BasketAction =
+  { type: 'add'; productCode: string } | { type: 'remove'; productCode: string } | { type: 'clear' }
 
 export type UseBasketResult = {
   basket: BasketState
   isUpdating: boolean
   addProduct: (productCode: string) => void
+  removeProduct: (productCode: string) => void
   clearBasket: () => void
 }
 
@@ -25,7 +27,11 @@ async function updateBasket(previous: BasketState, action: BasketAction): Promis
     return emptyBasket
   }
 
-  const productCodes = [...previous.productCodes, action.productCode]
+  const productCodes = nextProductCodes(previous.productCodes, action)
+
+  if (productCodes.length === 0) {
+    return emptyBasket
+  }
 
   try {
     const summaryResponse = await getBasketTotal(productCodes)
@@ -39,6 +45,19 @@ async function updateBasket(previous: BasketState, action: BasketAction): Promis
   }
 }
 
+function nextProductCodes(productCodes: string[], action: BasketAction): string[] {
+  if (action.type === 'add') {
+    const withAddedCode = [...productCodes, action.productCode]
+
+    return withAddedCode
+  }
+
+  const lastIndex = action.type === 'remove' ? productCodes.lastIndexOf(action.productCode) : -1
+  const withoutRemovedCode = productCodes.filter((_, index) => index !== lastIndex)
+
+  return withoutRemovedCode
+}
+
 export function useBasket(): UseBasketResult {
   const [basket, dispatch, isUpdating] = useActionState(updateBasket, emptyBasket)
 
@@ -48,11 +67,17 @@ export function useBasket(): UseBasketResult {
     })
   }
 
+  function removeProduct(productCode: string): void {
+    startTransition(() => {
+      dispatch({ type: 'remove', productCode })
+    })
+  }
+
   function clearBasket(): void {
     startTransition(() => {
       dispatch({ type: 'clear' })
     })
   }
 
-  return { basket, isUpdating, addProduct, clearBasket }
+  return { basket, isUpdating, addProduct, removeProduct, clearBasket }
 }

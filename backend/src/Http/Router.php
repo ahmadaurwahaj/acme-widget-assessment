@@ -8,6 +8,7 @@ use Acme\Http\Controller\BasketController;
 use Acme\Http\Controller\OfferController;
 use Acme\Http\Controller\ProductController;
 use Acme\Http\RateLimit\RateLimiter;
+use Closure;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
@@ -80,6 +81,7 @@ final readonly class Router
         ]);
     }
 
+    /** @return array<string, array<string, Closure(Request): JsonResponse>> */
     private function routes(): array
     {
         $routes = [

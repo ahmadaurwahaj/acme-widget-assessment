@@ -88,17 +88,49 @@
   border-bottom: 1px solid $color-border;
 
   li {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
     gap: 12px;
     padding: 4px 0;
     font-weight: 600;
   }
 }
 
+.lineTotal {
+  min-width: 64px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  button {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: 1px solid $color-border;
+    border-radius: 50%;
+    background: none;
+    color: $color-text;
+
+    &:hover {
+      border-color: $color-accent;
+      color: $color-accent;
+    }
+  }
+}
+
 .quantity {
+  min-width: 18px;
+  text-align: center;
   color: $color-muted;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .totals {

@@ -21,7 +21,7 @@ export function OfferBanner({ offers }: OfferBannerProps) {
 
         <ul className={styles.offers}>
           {offers.map((offer) => (
-            <li key={offer.description}>{offer.description}</li>
+            <li key={offer.code}>{offer.description}</li>
           ))}
         </ul>
       </div>

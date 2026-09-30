@@ -28,6 +28,7 @@ final class BasketTest extends TestCase
         return $basket;
     }
 
+    /** @param list<string> $productCodes */
     private function addAll(Basket $basket, array $productCodes): void
     {
         foreach ($productCodes as $productCode) {
@@ -35,6 +36,7 @@ final class BasketTest extends TestCase
         }
     }
 
+    /** @return iterable<string, array{list<string>, int}> */
     public static function specExamples(): iterable
     {
         yield 'B01, G01' => [['B01', 'G01'], 3785];
@@ -43,6 +45,7 @@ final class BasketTest extends TestCase
         yield 'B01, B01, R01, R01, R01' => [['B01', 'B01', 'R01', 'R01', 'R01'], 9827];
     }
 
+    /** @param list<string> $productCodes */
     #[DataProvider('specExamples')]
     public function testSpecExampleTotals(array $productCodes, int $expectedTotal): void
     {
@@ -90,6 +93,7 @@ final class BasketTest extends TestCase
         self::assertSame(5437, $priceBreakdown->totalInCents);
     }
 
+    /** @return iterable<string, array{list<string>, int, int}> */
     public static function discountLandsOnDeliveryBoundary(): iterable
     {
         yield 'exactly $50 after the offer' => [['A01', 'A01', 'X50'], 5000, 295];
@@ -98,6 +102,7 @@ final class BasketTest extends TestCase
         yield 'one cent under $90 after the offer' => [['C01', 'C01', 'Y14'], 8999, 295];
     }
 
+    /** @param list<string> $productCodes */
     #[DataProvider('discountLandsOnDeliveryBoundary')]
     public function testDiscountCanMoveTheDeliveryTier(array $productCodes, int $expectedSpend, int $expectedDelivery): void
     {

@@ -10,8 +10,10 @@ use SplFileObject;
 
 final readonly class FileRateLimiter implements RateLimiter
 {
+    /** @var Closure(): int */
     private Closure $clock;
 
+    /** @param (Closure(): int)|null $clock */
     public function __construct(
         private string $storageDirectory,
         private int $maxRequests,
@@ -69,6 +71,7 @@ final readonly class FileRateLimiter implements RateLimiter
         return $counterFile;
     }
 
+    /** @return array{int, int} */
     private function readCounter(SplFileObject $counterFile): array
     {
         $counterFile->rewind();

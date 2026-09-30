@@ -1,16 +1,24 @@
 import type { BasketState } from '../../hooks/useBasket'
 import type { BasketSummaryResponseDto } from '../../types/dto'
 import { formatCents } from '../../utils/money'
-import { BasketIcon, CartIcon } from '../icons/icons'
+import { BasketIcon, CartIcon, MinusIcon, PlusIcon } from '../icons/icons'
 import styles from './BasketPanel.module.scss'
 
 type BasketPanelProps = {
   basket: BasketState
   isUpdating: boolean
+  onAddProduct: (productCode: string) => void
+  onRemoveProduct: (productCode: string) => void
   onClearBasket: () => void
 }
 
-export function BasketPanel({ basket, isUpdating, onClearBasket }: BasketPanelProps) {
+export function BasketPanel({
+  basket,
+  isUpdating,
+  onAddProduct,
+  onRemoveProduct,
+  onClearBasket,
+}: BasketPanelProps) {
   const hasItems = basket.productCodes.length > 0
 
   return (
@@ -34,7 +42,12 @@ export function BasketPanel({ basket, isUpdating, onClearBasket }: BasketPanelPr
         </p>
       )}
 
-      <BasketContent summaryResponse={basket.summaryResponse} isUpdating={isUpdating} />
+      <BasketContent
+        summaryResponse={basket.summaryResponse}
+        isUpdating={isUpdating}
+        onAddProduct={onAddProduct}
+        onRemoveProduct={onRemoveProduct}
+      />
     </section>
   )
 }
@@ -42,11 +55,25 @@ export function BasketPanel({ basket, isUpdating, onClearBasket }: BasketPanelPr
 type BasketContentProps = {
   summaryResponse: BasketSummaryResponseDto | null
   isUpdating: boolean
+  onAddProduct: (productCode: string) => void
+  onRemoveProduct: (productCode: string) => void
 }
 
-function BasketContent({ summaryResponse, isUpdating }: BasketContentProps) {
+function BasketContent({
+  summaryResponse,
+  isUpdating,
+  onAddProduct,
+  onRemoveProduct,
+}: BasketContentProps) {
   if (summaryResponse) {
-    return <BasketSummary summaryResponse={summaryResponse} isUpdating={isUpdating} />
+    return (
+      <BasketSummary
+        summaryResponse={summaryResponse}
+        isUpdating={isUpdating}
+        onAddProduct={onAddProduct}
+        onRemoveProduct={onRemoveProduct}
+      />
+    )
   }
 
   if (isUpdating) {
@@ -67,9 +94,16 @@ function BasketContent({ summaryResponse, isUpdating }: BasketContentProps) {
 type BasketSummaryProps = {
   summaryResponse: BasketSummaryResponseDto
   isUpdating: boolean
+  onAddProduct: (productCode: string) => void
+  onRemoveProduct: (productCode: string) => void
 }
 
-function BasketSummary({ summaryResponse, isUpdating }: BasketSummaryProps) {
+function BasketSummary({
+  summaryResponse,
+  isUpdating,
+  onAddProduct,
+  onRemoveProduct,
+}: BasketSummaryProps) {
   const hasDiscount = summaryResponse.discountInCents > 0
   const deliveryLabel =
     summaryResponse.deliveryInCents === 0 ? 'Free' : formatCents(summaryResponse.deliveryInCents)
@@ -79,10 +113,25 @@ function BasketSummary({ summaryResponse, isUpdating }: BasketSummaryProps) {
       <ul className={styles.lines}>
         {summaryResponse.lines.map((line) => (
           <li key={line.code}>
-            <span>
-              {line.name} <span className={styles.quantity}>× {line.quantity}</span>
+            <span className={styles.lineName}>{line.name}</span>
+            <span className={styles.stepper}>
+              <button
+                type="button"
+                onClick={() => onRemoveProduct(line.code)}
+                aria-label={`Remove one ${line.name}`}
+              >
+                <MinusIcon />
+              </button>
+              <span className={styles.quantity}>{line.quantity}</span>
+              <button
+                type="button"
+                onClick={() => onAddProduct(line.code)}
+                aria-label={`Add one ${line.name}`}
+              >
+                <PlusIcon />
+              </button>
             </span>
-            <span>{formatCents(line.lineTotalInCents)}</span>
+            <span className={styles.lineTotal}>{formatCents(line.lineTotalInCents)}</span>
           </li>
         ))}
       </ul>

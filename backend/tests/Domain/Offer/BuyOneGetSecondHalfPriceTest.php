@@ -12,6 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 final class BuyOneGetSecondHalfPriceTest extends TestCase
 {
+    /** @return iterable<string, array{int, int}> */
     public static function quantities(): iterable
     {
         yield 'one widget, no pair' => [1, 0];

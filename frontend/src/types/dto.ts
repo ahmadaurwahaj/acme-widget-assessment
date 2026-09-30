@@ -29,5 +29,6 @@ export type ErrorResponseDto = {
 }
 
 export type OfferResponseDto = {
+  code: string
   description: string
 }

@@ -5,16 +5,22 @@ declare(strict_types=1);
 namespace Acme;
 
 use Acme\Domain\DeliveryRules;
+use Acme\Domain\Offer\Offer;
 use Acme\Repository\ProductRepository;
 use LogicException;
 
 final readonly class StoreConfig
 {
+    /** @var list<Offer> */
+    public array $offers;
+
     public function __construct(
         public ProductRepository $productRepository,
         public DeliveryRules $deliveryRules,
-        public array $offers,
-    ) {}
+        Offer ...$offers,
+    ) {
+        $this->offers = array_values($offers);
+    }
 
     public static function fromFile(string $path): self
     {

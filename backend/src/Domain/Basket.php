@@ -9,8 +9,10 @@ use Acme\Repository\ProductRepository;
 
 final class Basket
 {
+    /** @var array<string, BasketLine> */
     private array $lines = [];
 
+    /** @var list<Offer> */
     private readonly array $offers;
 
     public function __construct(
@@ -18,7 +20,7 @@ final class Basket
         private readonly DeliveryRules $deliveryRules,
         Offer ...$offers,
     ) {
-        $this->offers = $offers;
+        $this->offers = array_values($offers);
     }
 
     public function add(string $productCode): void
@@ -29,6 +31,7 @@ final class Basket
         $this->lines[$product->code] = new BasketLine($product, $currentQuantity + 1);
     }
 
+    /** @return list<BasketLine> */
     public function lines(): array
     {
         return array_values($this->lines);

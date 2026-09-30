@@ -12,6 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 final class DeliveryRulesTest extends TestCase
 {
+    /** @return iterable<string, array{int, int}> */
     public static function bandBoundaries(): iterable
     {
         yield 'just under $50' => [4999, 495];

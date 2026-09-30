@@ -13,6 +13,7 @@ final readonly class PriceBasketRequestDto
 
     private const string PRODUCT_CODE_PATTERN = '/^[A-Za-z0-9]{1,32}$/';
 
+    /** @param list<string> $productCodes */
     private function __construct(public array $productCodes) {}
 
     public static function fromJson(string $requestBody): self

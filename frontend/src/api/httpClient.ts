@@ -19,6 +19,11 @@ export function toErrorMessage(error: unknown): string {
 }
 
 async function readErrorMessage(response: Response): Promise<string> {
+  const retryAfterSeconds = Number(response.headers.get('Retry-After'))
+  if (response.status === 429 && retryAfterSeconds > 0) {
+    return `Too many requests. Please try again in ${retryAfterSeconds} seconds.`
+  }
+
   const errorResponse: Partial<ErrorResponseDto> = await response.json().catch(() => ({}))
 
   if (errorResponse.error) {

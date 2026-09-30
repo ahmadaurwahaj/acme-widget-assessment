@@ -10,6 +10,7 @@ final readonly class DeliveryRules
 {
     private const int FREE_DELIVERY = 0;
 
+    /** @var list<DeliveryTier> */
     private array $tiers;
 
     public function __construct(DeliveryTier ...$tiers)

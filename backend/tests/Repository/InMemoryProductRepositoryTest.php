@@ -8,6 +8,7 @@ use Acme\Domain\Product;
 use Acme\Domain\UnknownProductException;
 use Acme\Repository\InMemoryProductRepository;
 use InvalidArgumentException;
+use LogicException;
 use PHPUnit\Framework\TestCase;
 
 final class InMemoryProductRepositoryTest extends TestCase
@@ -27,6 +28,28 @@ final class InMemoryProductRepositoryTest extends TestCase
 
         $this->expectException(UnknownProductException::class);
         $repository->getByCode('B01');
+    }
+
+    public function testLoadsTheShopProductsFromFile(): void
+    {
+        $repository = InMemoryProductRepository::fromFile(__DIR__ . '/../../config/products.php');
+
+        self::assertCount(3, $repository->findAll());
+        self::assertSame(3295, $repository->getByCode('R01')->priceInCents);
+    }
+
+    public function testFileWithSomethingOtherThanProductsIsRejected(): void
+    {
+        $path = sys_get_temp_dir() . '/acme-products-' . bin2hex(random_bytes(4)) . '.php';
+        file_put_contents($path, "<?php return ['R01'];");
+
+        $this->expectException(LogicException::class);
+
+        try {
+            InMemoryProductRepository::fromFile($path);
+        } finally {
+            unlink($path);
+        }
     }
 
     public function testDuplicateCodesAreRejected(): void
