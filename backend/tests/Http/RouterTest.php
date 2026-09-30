@@ -29,7 +29,7 @@ final class RouterTest extends TestCase
 
     private function send(string $method, string $path, string $requestBody = ''): JsonResponse
     {
-        $request = new Request($method, $path, $requestBody, clientIp: '203.0.113.7');
+        $request = new Request($method, $path, $requestBody, clientIp: '203.0.113.7', contentType: 'application/json');
 
         $response = $this->router->handle($request);
 
@@ -62,7 +62,7 @@ final class RouterTest extends TestCase
 
         self::assertSame(200, $response->status);
         self::assertSame(
-            [['description' => 'Buy one Red Widget, get the second one half price']],
+            [['code' => 'r01-second-half-price', 'description' => 'Buy one Red Widget, get the second one half price']],
             $this->responseBodyOf($response),
         );
     }
@@ -142,7 +142,7 @@ final class RouterTest extends TestCase
         $rateLimiter = new FileRateLimiter(sys_get_temp_dir() . '/acme-rate-limit-test-' . bin2hex(random_bytes(4)), 1, 60);
         $logRecords = new TestHandler();
         $router = Application::createRouter($storeConfig, $rateLimiter, new Logger('test', [$logRecords]));
-        $request = new Request('GET', '/api/v1/products', '', clientIp: '203.0.113.9');
+        $request = new Request('POST', '/api/v1/basket/total', '{"productCodes":["R01"]}', clientIp: '203.0.113.9', contentType: 'application/json');
 
         $router->handle($request);
         $response = $router->handle($request);
@@ -150,5 +150,45 @@ final class RouterTest extends TestCase
         self::assertSame(429, $response->status);
         self::assertArrayHasKey('Retry-After', $response->headers);
         self::assertTrue($logRecords->hasWarningThatContains('Rejected {method} {path} with {status}'));
+        self::assertStringNotContainsString('203.0.113.9', json_encode($logRecords->getRecords()[0]->context, JSON_THROW_ON_ERROR));
+    }
+
+    public function testReadRequestsAreNotRateLimited(): void
+    {
+        $storeConfig = StoreConfig::fromFile(__DIR__ . '/../../config/store.php');
+        $rateLimiter = new FileRateLimiter(sys_get_temp_dir() . '/acme-rate-limit-test-' . bin2hex(random_bytes(4)), 1, 60);
+        $router = Application::createRouter($storeConfig, $rateLimiter, new NullLogger());
+        $request = new Request('GET', '/api/v1/products', '', clientIp: '203.0.113.10');
+
+        $router->handle($request);
+        $response = $router->handle($request);
+
+        self::assertSame(200, $response->status);
+    }
+
+    public static function wrongContentTypes(): iterable
+    {
+        yield 'missing' => [''];
+        yield 'plain text' => ['text/plain'];
+        yield 'form' => ['application/x-www-form-urlencoded'];
+    }
+
+    #[DataProvider('wrongContentTypes')]
+    public function testPostWithoutJsonContentTypeGets415(string $contentType): void
+    {
+        $request = new Request('POST', '/api/v1/basket/total', '{"productCodes":["R01"]}', clientIp: '203.0.113.7', contentType: $contentType);
+
+        $response = $this->router->handle($request);
+
+        self::assertSame(415, $response->status);
+    }
+
+    public function testJsonContentTypeWithCharsetIsAccepted(): void
+    {
+        $request = new Request('POST', '/api/v1/basket/total', '{"productCodes":["R01"]}', clientIp: '203.0.113.7', contentType: 'application/json; charset=utf-8');
+
+        $response = $this->router->handle($request);
+
+        self::assertSame(200, $response->status);
     }
 }

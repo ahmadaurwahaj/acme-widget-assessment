@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Acme\Domain;
 
-final class DeliveryRules
+use InvalidArgumentException;
+
+final readonly class DeliveryRules
 {
     private const int FREE_DELIVERY = 0;
 
@@ -12,6 +14,14 @@ final class DeliveryRules
 
     public function __construct(DeliveryTier ...$tiers)
     {
+        $thresholds = [];
+        foreach ($tiers as $tier) {
+            if (isset($thresholds[$tier->spendBelowInCents])) {
+                throw new InvalidArgumentException("Two delivery tiers share the threshold {$tier->spendBelowInCents}.");
+            }
+            $thresholds[$tier->spendBelowInCents] = true;
+        }
+
         usort($tiers, static fn(DeliveryTier $a, DeliveryTier $b): int => $a->spendBelowInCents <=> $b->spendBelowInCents);
         $this->tiers = $tiers;
     }

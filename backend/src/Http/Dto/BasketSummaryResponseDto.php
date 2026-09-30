@@ -23,12 +23,14 @@ final readonly class BasketSummaryResponseDto
             $lineDtos[] = BasketLineResponseDto::fromBasketLine($line);
         }
 
+        $priceBreakdown = $basket->priceBreakdown();
+
         $summaryDto = new self(
             lines: $lineDtos,
-            subtotalInCents: $basket->subtotal(),
-            discountInCents: $basket->discount(),
-            deliveryInCents: $basket->delivery(),
-            totalInCents: $basket->total(),
+            subtotalInCents: $priceBreakdown->subtotalInCents,
+            discountInCents: $priceBreakdown->discountInCents,
+            deliveryInCents: $priceBreakdown->deliveryInCents,
+            totalInCents: $priceBreakdown->totalInCents,
         );
 
         return $summaryDto;

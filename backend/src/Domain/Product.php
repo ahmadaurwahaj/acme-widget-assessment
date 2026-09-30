@@ -16,6 +16,9 @@ final readonly class Product
         if ($code === '') {
             throw new InvalidArgumentException('Product code cannot be empty.');
         }
+        if (trim($name) === '') {
+            throw new InvalidArgumentException("Product {$code} needs a name.");
+        }
         if ($priceInCents < 0) {
             throw new InvalidArgumentException("Product {$code} cannot have a negative price.");
         }

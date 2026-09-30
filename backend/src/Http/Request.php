@@ -11,5 +11,6 @@ final readonly class Request
         public string $path,
         public string $body,
         public string $clientIp,
+        public string $contentType = '',
     ) {}
 }

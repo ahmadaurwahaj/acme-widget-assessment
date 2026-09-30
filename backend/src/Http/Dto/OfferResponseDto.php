@@ -8,11 +8,14 @@ use Acme\Domain\Offer\Offer;
 
 final readonly class OfferResponseDto
 {
-    public function __construct(public string $description) {}
+    public function __construct(
+        public string $code,
+        public string $description,
+    ) {}
 
     public static function fromOffer(Offer $offer): self
     {
-        $offerDto = new self($offer->description());
+        $offerDto = new self($offer->code(), $offer->description());
 
         return $offerDto;
     }

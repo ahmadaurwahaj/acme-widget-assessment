@@ -31,9 +31,7 @@ final class Basket
 
     public function lines(): array
     {
-        $lines = array_values($this->lines);
-
-        return $lines;
+        return array_values($this->lines);
     }
 
     public function isEmpty(): bool
@@ -41,7 +39,33 @@ final class Basket
         return $this->lines === [];
     }
 
-    public function subtotal(): int
+    public function priceBreakdown(): PriceBreakdown
+    {
+        $subtotal = $this->subtotal();
+        $discount = min($this->discount(), $subtotal);
+        $spendAfterOffers = $subtotal - $discount;
+
+        $delivery = 0;
+        if (!$this->isEmpty()) {
+            $delivery = $this->deliveryRules->chargeFor($spendAfterOffers);
+        }
+
+        $priceBreakdown = new PriceBreakdown(
+            subtotalInCents: $subtotal,
+            discountInCents: $discount,
+            deliveryInCents: $delivery,
+            totalInCents: $spendAfterOffers + $delivery,
+        );
+
+        return $priceBreakdown;
+    }
+
+    public function total(): int
+    {
+        return $this->priceBreakdown()->totalInCents;
+    }
+
+    private function subtotal(): int
     {
         $subtotal = 0;
         foreach ($this->lines as $line) {
@@ -51,35 +75,15 @@ final class Basket
         return $subtotal;
     }
 
-    public function discount(): int
+    private function discount(): int
     {
         $lines = $this->lines();
 
         $discount = 0;
         foreach ($this->offers as $offer) {
-            $discount += $offer->discount($lines);
+            $discount += $offer->discount(...$lines);
         }
 
         return $discount;
-    }
-
-    public function delivery(): int
-    {
-        if ($this->isEmpty()) {
-            return 0;
-        }
-
-        $spendAfterOffers = $this->subtotal() - $this->discount();
-        $deliveryCharge = $this->deliveryRules->chargeFor($spendAfterOffers);
-
-        return $deliveryCharge;
-    }
-
-    public function total(): int
-    {
-        $spendAfterOffers = $this->subtotal() - $this->discount();
-        $total = $spendAfterOffers + $this->delivery();
-
-        return $total;
     }
 }

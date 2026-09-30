@@ -4,11 +4,19 @@ declare(strict_types=1);
 
 namespace Acme\Domain\Offer;
 
+use Acme\Domain\BasketLine;
 use Acme\Domain\Product;
 
 final readonly class BuyOneGetSecondHalfPrice implements Offer
 {
     public function __construct(private Product $product) {}
+
+    public function code(): string
+    {
+        $offerCode = strtolower($this->product->code) . '-second-half-price';
+
+        return $offerCode;
+    }
 
     public function description(): string
     {
@@ -17,7 +25,7 @@ final readonly class BuyOneGetSecondHalfPrice implements Offer
         return $description;
     }
 
-    public function discount(array $lines): int
+    public function discount(BasketLine ...$lines): int
     {
         $discount = 0;
 

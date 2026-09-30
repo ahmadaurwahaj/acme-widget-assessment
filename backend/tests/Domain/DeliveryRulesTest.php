@@ -41,6 +41,16 @@ final class DeliveryRulesTest extends TestCase
         self::assertSame(495, $rules->chargeFor(1000));
     }
 
+    public function testDuplicateThresholdsAreRejected(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        new DeliveryRules(
+            new DeliveryTier(spendBelowInCents: 5000, chargeInCents: 495),
+            new DeliveryTier(spendBelowInCents: 5000, chargeInCents: 295),
+        );
+    }
+
     public function testNegativeChargeIsRejected(): void
     {
         $this->expectException(InvalidArgumentException::class);

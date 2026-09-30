@@ -12,6 +12,8 @@ services:
     volumes:
       - ./backend:/app
     command: php -S 0.0.0.0:8000 -t public
+    environment:
+      RATE_LIMIT_PER_MINUTE: 300
     ports:
       - "8000:8000"
     depends_on:

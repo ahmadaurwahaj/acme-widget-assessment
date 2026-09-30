@@ -46,6 +46,13 @@ final class HttpException extends RuntimeException
         return $exception;
     }
 
+    public static function unsupportedMediaType(): self
+    {
+        $exception = new self(415, 'Request body must be sent as application/json.');
+
+        return $exception;
+    }
+
     public static function unprocessable(string $message): self
     {
         $exception = new self(422, $message);
