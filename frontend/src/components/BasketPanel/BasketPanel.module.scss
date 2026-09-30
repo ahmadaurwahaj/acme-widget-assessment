@@ -1,0 +1,91 @@
+@use '../../styles/tokens' as *;
+
+.panel {
+  @include card;
+
+  padding: 20px;
+  position: sticky;
+  top: $space-lg;
+
+  @include below($breakpoint-md) {
+    position: static;
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.clearButton {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: $color-accent;
+}
+
+.muted {
+  margin: 0;
+  color: $color-muted;
+}
+
+.error {
+  margin: 0 0 12px;
+  color: $color-danger;
+}
+
+.summary {
+  transition: opacity 0.15s;
+
+  &[aria-busy='true'] {
+    opacity: 0.6;
+  }
+}
+
+.lines {
+  list-style: none;
+  margin: 0 0 $space-md;
+  padding: 0 0 $space-md;
+  border-bottom: 1px solid $color-border;
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: $space-xs 0;
+  }
+}
+
+.quantity {
+  color: $color-muted;
+}
+
+.totals {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  row-gap: $space-sm;
+  margin: 0;
+
+  dt {
+    margin: 0;
+  }
+
+  dd {
+    margin: 0;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.discount {
+  color: $color-success;
+}
+
+.grandTotal {
+  margin-top: $space-sm;
+  padding-top: 12px;
+  border-top: 1px solid $color-border;
+  font-weight: 700;
+  font-size: 1.15rem;
+}

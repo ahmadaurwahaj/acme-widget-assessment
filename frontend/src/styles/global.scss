@@ -1,0 +1,31 @@
+@use 'tokens' as *;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  color-scheme: light;
+  font: 16px/1.5 $font-family;
+  color: $color-text;
+  background: $color-bg;
+}
+
+body {
+  margin: 0;
+}
+
+h1,
+h2 {
+  margin: 0 0 12px;
+  line-height: 1.2;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+
+  @include focus-ring;
+}

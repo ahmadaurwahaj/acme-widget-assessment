@@ -1,0 +1,51 @@
+$color-bg: #f6f5f1;
+$color-surface: #ffffff;
+$color-text: #1c1b19;
+$color-muted: #6d6a63;
+$color-border: #e4e1d9;
+$color-accent: #1f4fd1;
+$color-accent-hover: #173ea6;
+$color-success: #1d7a45;
+$color-danger: #b42318;
+
+$widget-colors: (
+  'R01': #d64545,
+  'G01': #2f9e5b,
+  'B01': #3867d6,
+);
+
+$radius-sm: 8px;
+$radius-md: 10px;
+
+$space-xs: 4px;
+$space-sm: 8px;
+$space-md: 16px;
+$space-lg: 24px;
+$space-xl: 40px;
+
+$font-family:
+  system-ui,
+  -apple-system,
+  'Segoe UI',
+  Roboto,
+  sans-serif;
+$breakpoint-md: 720px;
+
+@mixin card {
+  background: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+}
+
+@mixin below($breakpoint) {
+  @media (max-width: $breakpoint) {
+    @content;
+  }
+}
+
+@mixin focus-ring {
+  &:focus-visible {
+    outline: 2px solid $color-accent;
+    outline-offset: 2px;
+  }
+}
